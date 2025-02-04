@@ -1,0 +1,31 @@
+# Ignore arquivos do banco SQLite
+db.sqlite3
+
+# Ignore credenciais e configurações locais
+.env
+
+# Ignore arquivos gerados pelo Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore logs e cache
+*.log
+*.pot
+*.mo
+
+# Ignore arquivos temporários do Django
+media/
+static/
+
+# Ignore arquivos de dependências do ambiente virtual
+venv/
+env/
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore IDEs e ferramentas locais
+.vscode/
+.idea/
