@@ -5,24 +5,6 @@
 .idea/
 .DS_Store
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-venv/
-env/
-*.egg-info/
-
-# Django
-db.sqlite3
-media/
-static/
-
-# Node.js (NestJS)
-node_modules/
-dist/
-
 # Docker
 *.pid
 docker-compose.override.yml
