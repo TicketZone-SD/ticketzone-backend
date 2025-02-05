@@ -11,7 +11,7 @@ services:
       - "8000:8000"
     command: >
       sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+             python manage.py runserver 0.0.0.0:8000 --noreload"
     depends_on:
       - nestjs
 
@@ -21,6 +21,6 @@ services:
     env_file: ./nestjs/.env
     volumes:
       - ./nestjs:/app
+      - /app/node_modules
     ports:
       - "3003:3003"
-
