@@ -16,11 +16,11 @@ services:
       - nestjs
 
   nestjs:
-    build: ./nestjs/backend
+    build: ./nestjs
     container_name: nestjs_app
-    env_file: ./nestjs/backend/.env
+    env_file: ./nestjs/.env
     volumes:
-      - ./nestjs/backend:/app
+      - ./nestjs:/app
     ports:
       - "3003:3003"
 
