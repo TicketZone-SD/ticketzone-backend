@@ -8,8 +8,8 @@ WORKDIR /app
 ENV NODE_ENV=development
 
 # Copiar arquivos de dependências e instalar (incluindo dependências de desenvolvimento)
-COPY package*.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 
 # Copiar todo o código do NestJS
 COPY . .
