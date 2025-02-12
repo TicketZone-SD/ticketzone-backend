@@ -1,8 +1,11 @@
 # Usar imagem oficial do Node.js
-FROM node:20
+FROM node:22
 
 # Definir diretório de trabalho
 WORKDIR /app
+
+# Atualizar o npm para a versão mais recente
+RUN npm install -g npm@latest
 
 # Definir ambiente de desenvolvimento
 ENV NODE_ENV=development

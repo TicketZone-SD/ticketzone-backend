@@ -17,7 +17,7 @@ Antes de começar, certifique-se de ter instalado:
 
 Caso queira rodar localmente sem Docker:
 - [Python 3.11](https://www.python.org/downloads/)
-- [Node.js 20+](https://nodejs.org/en/)
+- [Node.js 22+](https://nodejs.org/en/)
 
 ---
 
