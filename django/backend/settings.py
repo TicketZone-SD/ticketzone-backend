@@ -23,6 +23,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
+    'backend',
+    
 ]
 
 # Middlewares
@@ -83,3 +86,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Tipo padrão de chave primária
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTH_USER_MODEL = 'users.User'
