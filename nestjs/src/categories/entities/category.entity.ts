@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Event } from '../events/entities/event.entity';
+import { Event } from '../../events/entities/event.entity';
 
 @Entity('categories')
 export class Category {
