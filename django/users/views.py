@@ -52,4 +52,15 @@ class DeleteUserView(generics.DestroyAPIView):
         return self.request.user
 
 
+# Listagem de Todos os Usuários
+class ListUsersView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+# Buscar um Usuário por ID
+class RetrieveUserView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
