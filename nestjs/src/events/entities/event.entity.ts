@@ -7,7 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Category } from './categories.entity';
+import { Category } from '../../categories/entities/category.entity';
 
 @Entity('events')
 export class Event {
@@ -20,7 +20,7 @@ export class Event {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'varchar', length: '255', nullable: true })
+  @Column({ type: 'varchar', length: '255' })
   local: string;
 
   @Column({ type: 'timestamp' })
@@ -35,9 +35,9 @@ export class Event {
   @Column({ type: 'int' })
   organizer: number;
 
-  @ManyToOne(() => Category, (category) => category.id)
-  @JoinColumn({ name: 'category_id' })
-  category_id: Category;
+  @ManyToOne(() => Category, (category) => category.events)
+  @JoinColumn({ name: 'category_id' }) // Nome da coluna no banco
+  category: Category; // Aqui o relacionamento é representado por um objeto do tipo Category
 
   @CreateDateColumn()
   created_at: Date;

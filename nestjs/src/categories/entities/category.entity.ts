@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Event } from './events.entity';
+import { Event } from '../../events/entities/event.entity';
 
 @Entity('categories')
 export class Category {
@@ -25,6 +25,6 @@ export class Category {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Event, (event) => event.category_id)
+  @OneToMany(() => Event, (event) => event.category)
   events: Event[];
 }

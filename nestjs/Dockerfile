@@ -12,6 +12,7 @@ ENV NODE_ENV=development
 
 # Copiar arquivos de dependências e instalar (incluindo dependências de desenvolvimento)
 COPY package.json package-lock.json ./
+RUN npm install
 RUN npm ci
 
 # Copiar todo o código do NestJS
