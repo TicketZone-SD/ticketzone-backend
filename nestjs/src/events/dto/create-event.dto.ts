@@ -2,11 +2,11 @@ import {
   IsString,
   IsOptional,
   IsNotEmpty,
-  IsDate,
   IsNumber,
   IsPositive,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
+import { BadRequestException } from '@nestjs/common';
 
 export class CreateEventDto {
   @IsString()
@@ -21,8 +21,15 @@ export class CreateEventDto {
   @IsNotEmpty()
   local: string;
 
-  @IsDate()
-  @Type(() => Date)
+  @Transform(({ value }: { value: string | Date }) => {
+    const date = new Date(value);
+    if (isNaN(date.getTime())) {
+      throw new BadRequestException(
+        'Invalid date format. Use ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.sssZ)',
+      );
+    }
+    return date;
+  })
   date: Date;
 
   @IsNumber()
