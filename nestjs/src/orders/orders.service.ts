@@ -107,6 +107,17 @@ export class OrdersService {
     return order;
   }
 
+  async findByUserId(userId: number): Promise<Order[]> {
+    const orders = await this.ordersRepository.find({
+      where: { user_id: userId },
+      relations: ['event', 'ticketType'],
+    });
+    if (!orders.length) {
+      throw new NotFoundException(`No orders found for User with ID ${userId}`);
+    }
+    return orders;
+  }
+
   // Atualiza um pedido existente
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
     // Busca a order existente
