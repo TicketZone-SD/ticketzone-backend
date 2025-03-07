@@ -7,40 +7,69 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  ForbiddenException,
+  //UseGuards,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+//import { RolesGuard } from '../guards/roles.guard';
 
 @Controller('events')
+//@UseGuards(RolesGuard)
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  create(@Body() createEventDto: CreateEventDto) {
+  async create(@Body() createEventDto: CreateEventDto) {
+    if (createEventDto.role !== 'organizer') {
+      throw new ForbiddenException('Only organizers can create events');
+    }
     return this.eventsService.create(createEventDto);
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.eventsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.eventsService.findOne(id);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateEventDto: UpdateEventDto,
   ) {
+    if (updateEventDto.role !== 'organizer') {
+      throw new ForbiddenException('Only organizers can update events');
+    }
     return this.eventsService.update(id, updateEventDto);
+  }
+  // Buscar eventos por categoria com data futura
+  @Get('category/:categoryId')
+  async findByCategory(@Param('categoryId', ParseIntPipe) categoryId: number) {
+    return this.eventsService.findEventsByCategory(categoryId);
+  }
+
+  // Obter a soma dos ingressos vendidos por tipo para um evento
+  @Get(':id/tickets-sold-detailed')
+  async getTicketsSoldByTypeDetailed(@Param('id', ParseIntPipe) id: number) {
+    return this.eventsService.getTicketsSoldByTypeDetailed(id);
+  }
+
+  // Buscar eventos por organizador
+  @Get('organizer/:organizerId')
+  async findByOrganizer(
+    @Param('organizerId', ParseIntPipe) organizerId: number,
+  ) {
+    return this.eventsService.findEventsByOrganizer(organizerId);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return this.eventsService.remove(id);
   }
 }

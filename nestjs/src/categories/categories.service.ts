@@ -41,7 +41,7 @@ export class CategoriesService {
     return await this.categoriesRepository.save(updatedCategory);
   }
 
-  // Remove uma categoria pelo ID
+  // Remover uma categoria pelo ID
   async remove(id: number): Promise<void> {
     const result = await this.categoriesRepository.delete(id);
     if (result.affected === 0) {
