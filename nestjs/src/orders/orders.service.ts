@@ -1,56 +1,3 @@
-/*import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Order } from './entities/order.entity';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
-
-@Injectable()
-export class OrdersService {
-  constructor(
-    @InjectRepository(Order)
-    private readonly ordersRepository: Repository<Order>,
-  ) {}
-
-  // Criação de um novo pedido (Order)
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    // Converte DTO em uma instância de Order
-    const order = this.ordersRepository.create(createOrderDto);
-    // Salva no banco
-    return this.ordersRepository.save(order);
-  }
-
-  // Retorna todos os pedidos
-  async findAll(): Promise<Order[]> {
-    return this.ordersRepository.find();
-  }
-
-  // Busca um pedido específico pelo ID
-  async findOne(id: number): Promise<Order> {
-    const order = await this.ordersRepository.findOne({ where: { id } });
-    if (!order) {
-      throw new NotFoundException(`Order com ID ${id} não encontrado`);
-    }
-    return order;
-  }
-
-  // Atualiza um pedido existente
-  async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    const order = await this.findOne(id);
-    Object.assign(order, updateOrderDto);
-    return this.ordersRepository.save(order);
-  }
-
-  // Remove um pedido pelo ID
-  async remove(id: number): Promise<void> {
-    const result = await this.ordersRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Order com ID ${id} não encontrado`);
-    }
-  }
-}
-*/
-
 import {
   Injectable,
   NotFoundException,
@@ -165,9 +112,6 @@ export class OrdersService {
     // Busca a order existente
     const order = await this.findOne(id);
 
-    // Se o update modificar o event_id ou ticket_type_id ou quantity,
-    // refaça as mesmas validações:
-    // 1. Se event_id for alterado, verifique se o evento existe
     if (updateOrderDto.event_id && updateOrderDto.event_id !== order.event_id) {
       const event = await this.eventsRepository.findOne({
         where: { id: updateOrderDto.event_id },
@@ -180,7 +124,7 @@ export class OrdersService {
       order.event_id = updateOrderDto.event_id;
     }
 
-    // 2. Se ticket_type_id for alterado, verifique se o ticket type existe e pertence ao mesmo evento
+    // Se ticket_type_id for alterado, verifique se o ticket type existe e pertence ao mesmo evento
     if (
       updateOrderDto.ticket_type_id &&
       updateOrderDto.ticket_type_id !== order.ticket_type_id
@@ -202,7 +146,7 @@ export class OrdersService {
       order.ticket_type_id = updateOrderDto.ticket_type_id;
     }
 
-    // 3. Se quantity for atualizada, verifique a disponibilidade de ingressos
+    // Se quantity for atualizada, verifique a disponibilidade de ingressos
     if (updateOrderDto.quantity !== undefined) {
       // Busca todas as orders para esse ticket type, subtraindo a quantidade da order atual (pois ela será substituída)
       const existingOrders = await this.ordersRepository.find({
@@ -229,8 +173,7 @@ export class OrdersService {
       order.quantity = updateOrderDto.quantity;
     }
 
-    // 4. Recalcular total_price se quantity or ticket_type_id or price change
-    // Para isso, pegamos o ticketType atual (ou atualizado, se ticket_type_id mudou)
+    // Recalcular total_price se quantity or ticket_type_id or price change
     const ticketType = await this.ticketTypeRepository.findOne({
       where: { id: order.ticket_type_id },
     });

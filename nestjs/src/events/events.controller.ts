@@ -8,11 +8,13 @@ import {
   Delete,
   ParseIntPipe,
   ForbiddenException,
+  Query,
   //UseGuards,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { Event as EventEntity } from './entities/event.entity';
 //import { RolesGuard } from '../guards/roles.guard';
 
 @Controller('events')
@@ -31,6 +33,11 @@ export class EventsController {
   @Get()
   async findAll() {
     return this.eventsService.findAll();
+  }
+
+  @Get('search')
+  async searchByName(@Query('q') query: string): Promise<EventEntity[]> {
+    return this.eventsService.searchByName(query);
   }
 
   @Get(':id')
@@ -58,6 +65,13 @@ export class EventsController {
   @Get(':id/tickets-sold-detailed')
   async getTicketsSoldByTypeDetailed(@Param('id', ParseIntPipe) id: number) {
     return this.eventsService.getTicketsSoldByTypeDetailed(id);
+  }
+
+  // Retornar a quantidade de ingressos vendidos para um evento
+  @Get(':id/sold-tickets')
+  async getSoldTickets(@Param('id', ParseIntPipe) id: number) {
+    const sold = await this.eventsService.getSoldTickets(id);
+    return { eventId: id, soldTickets: sold };
   }
 
   // Buscar eventos por organizador

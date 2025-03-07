@@ -14,10 +14,6 @@ export class TicketType {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // Se você quiser manter apenas o ID do evento sem relacionamento,
-  // use apenas @Column(). Se quiser relacionamento com a entidade Event,
-  // use ManyToOne + JoinColumn e uma propriedade "event: Event" no lugar.
-  // Aqui vai um exemplo mantendo a FK e também a relação:
   @ManyToOne(() => Event, (event) => event.id, { eager: false })
   @JoinColumn({ name: 'event_id' })
   event: Event;
