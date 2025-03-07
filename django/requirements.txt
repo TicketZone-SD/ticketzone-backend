@@ -1,6 +1,12 @@
 asgiref==3.8.1
+debugpy==1.8.12
 Django==5.1.5
+django-cors-headers==4.7.0
+django-environ==0.12.0
 djangorestframework==3.15.2
+djangorestframework_simplejwt==5.5.0
+psycopg==3.2.4
+psycopg-binary==3.2.4
+PyJWT==2.9.0
 sqlparse==0.5.3
-django-environ
-psycopg[binary]
+typing_extensions==4.12.2

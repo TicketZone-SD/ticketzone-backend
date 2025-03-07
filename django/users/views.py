@@ -29,6 +29,7 @@ class LoginUserView(APIView):
             refresh = RefreshToken.for_user(user)
             update_last_login(None, user)
             return Response({
+                'user': UserSerializer(user).data,
                 'refresh': str(refresh),
                 'access': str(refresh.access_token)
             })
@@ -42,6 +43,14 @@ class UpdateUserView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        partial = True  # Permite atualização parcial
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 #  Exclusão de Usuário
 class DeleteUserView(generics.DestroyAPIView):
