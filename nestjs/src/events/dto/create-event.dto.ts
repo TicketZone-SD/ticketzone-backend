@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsPositive,
+  IsIn,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { BadRequestException } from '@nestjs/common';
@@ -47,4 +48,8 @@ export class CreateEventDto {
   @IsNumber()
   @IsPositive()
   category_id: number;
+
+  @IsString()
+  @IsIn(['organizer'])
+  role: string;
 }
