@@ -1,73 +1,3 @@
-/*import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, Repository } from 'typeorm';
-import { Event } from './entities/event.entity';
-import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
-import { Order } from '../orders/entities/order.entity';
-import { Order } from '../orders/entities/order.entity';
-
-@Injectable()
-export class EventsService {
-  constructor(
-    @InjectRepository(Event)
-    @InjectRepository(Order)
-    private readonly ordersRepository: Repository<Order>,
-  ) {}
-  ) {}
-
-  // Criação de um novo evento
-  async create(createEventDto: CreateEventDto): Promise<Event> {
-    // Converte o número da categoria em um objeto com a propriedade id
-    const eventData: DeepPartial<Event> = {
-      ...createEventDto,
-      category: { id: createEventDto.category_id },
-    };
-
-    const event = this.eventsRepository.create(eventData);
-    return this.eventsRepository.save(event);
-  }
-
-  // Listagem de todos os eventos
-  async findAll(): Promise<Event[]> {
-    return await this.eventsRepository.find();
-  }
-
-  // Busca de um evento específico pelo ID
-  async findOne(id: number): Promise<Event> {
-    const event = await this.eventsRepository.findOne({ where: { id } });
-    if (!event) {
-      throw new NotFoundException(`Evento com ID ${id} não encontrado`);
-    }
-    return event;
-  }
-
-  // Atualização de um evento
-  async update(id: number, updateEventDto: UpdateEventDto): Promise<Event> {
-    const event = await this.findOne(id);
-
-    // Extrai a propriedade category_id e os demais campos
-    const { category_id, ...otherData } = updateEventDto;
-
-    const updateData: DeepPartial<Event> = {
-      ...otherData,
-      ...(category_id ? { category_id: { id: category_id } } : {}),
-    };
-
-    const updatedEvent = Object.assign(event, updateData);
-    return await this.eventsRepository.save(updatedEvent);
-  }
-
-  // Remoção de um evento
-  async remove(id: number): Promise<void> {
-    const result = await this.eventsRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Evento com ID ${id} não encontrado`);
-    }
-  }
-}
-*/
-
 import {
   Injectable,
   NotFoundException,
@@ -80,6 +10,8 @@ import { Category } from '../categories/entities/category.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Order } from '../orders/entities/order.entity';
+import { MoreThan } from 'typeorm';
+import { Not } from 'typeorm';
 
 interface TicketTypeRawResult {
   name: string;
@@ -125,10 +57,6 @@ export class EventsService {
       throw new BadRequestException('Event price must be greater than 0');
     }
 
-    // Se o organizador for gerenciado externamente (Django), apenas armazene o ID.
-    // Se precisar, adicione uma validação semelhante.
-
-    // Cria o objeto para persistência, associando o objeto Category encontrado
     const eventData: DeepPartial<Event> = {
       ...createEventDto,
       category: category,
@@ -191,12 +119,19 @@ export class EventsService {
 
   // Listagem de todos os eventos
   async findAll(): Promise<Event[]> {
-    return await this.eventsRepository.find();
+    const now = new Date();
+    return await this.eventsRepository.find({
+      where: { date: MoreThan(now) },
+      relations: ['category'],
+    });
   }
 
   // Busca de um evento específico pelo ID
   async findOne(id: number): Promise<Event> {
-    const event = await this.eventsRepository.findOne({ where: { id } });
+    const event = await this.eventsRepository.findOne({
+      where: { id },
+      relations: ['category'],
+    });
     if (!event) {
       throw new NotFoundException(`Event with ID ${id} not found`);
     }
@@ -204,7 +139,6 @@ export class EventsService {
   }
 
   async findEventsByCategory(categoryId: number): Promise<Event[]> {
-    // Verifica se a categoria existe
     const category = await this.categoryRepository.findOne({
       where: { id: categoryId },
     });
@@ -224,6 +158,7 @@ export class EventsService {
 
     return events;
   }
+
   // Remoção de um evento
   async remove(id: number): Promise<void> {
     const result = await this.eventsRepository.delete(id);
@@ -236,7 +171,7 @@ export class EventsService {
   async getSoldTickets(eventId: number): Promise<number> {
     // Certifique-se de que 'ordersRepository' seja do tipo Repository<Order>
     const orders: Order[] = await this.ordersRepository.find({
-      where: { event_id: eventId },
+      where: { event_id: eventId, status: Not('Pendente') },
     });
 
     // Agora o TS sabe que 'orders' é Order[]
@@ -249,6 +184,7 @@ export class EventsService {
   async findEventsByOrganizer(organizerId: number): Promise<Event[]> {
     const events = await this.eventsRepository.find({
       where: { organizer: organizerId },
+      relations: ['category'],
     });
     if (!events.length) {
       throw new NotFoundException(
@@ -276,6 +212,7 @@ export class EventsService {
       .addSelect('SUM(order.quantity)', 'sold')
       .where('order.event_id = :eventId', { eventId })
       .andWhere('order.status != :status', { status: 'Cancelado' })
+      .andWhere('order.status != :status', { status: 'Pendente' })
       .groupBy('ticketType.name')
       .addGroupBy('ticketType.capacity')
       .getRawMany<TicketTypeRawResult>();
@@ -288,5 +225,22 @@ export class EventsService {
         sold: Number(row.sold),
       },
     }));
+  }
+
+  async searchByName(query: string): Promise<Event[]> {
+    // Converte a query para minúsculas para uma busca case-insensitive
+    const lowerQuery = `%${query.toLowerCase()}%`;
+
+    // Utiliza o QueryBuilder para buscar eventos cujo nome contenha a substring
+    const events = await this.eventsRepository
+      .createQueryBuilder('event')
+      .where('LOWER(event.name) LIKE :query', { query: lowerQuery })
+      .getMany();
+
+    if (!events.length) {
+      throw new NotFoundException(`No events found matching "${query}"`);
+    }
+
+    return events;
   }
 }
