@@ -95,6 +95,18 @@ export class TypesService {
     return ticketType;
   }
 
+  async findByEvent(eventId: number): Promise<TicketType[]> {
+    const ticketTypes = await this.ticketTypeRepository.find({
+      where: { event_id: eventId },
+    });
+    if (!ticketTypes) {
+      throw new NotFoundException(
+        `TicketType com ID ${eventId} não encontrado`,
+      );
+    }
+    return ticketTypes;
+  }
+
   // Atualiza um ticket type existente
   async update(id: number, updateTypeDto: UpdateTypeDto): Promise<TicketType> {
     const ticketType = await this.findOne(id);

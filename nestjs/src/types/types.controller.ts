@@ -35,6 +35,13 @@ export class TypesController {
     return this.typesService.findOne(id);
   }
 
+  @Get('event/:eventId')
+  async findByEvent(
+    @Param('eventId', ParseIntPipe) eventId: number,
+  ): Promise<TicketType[]> {
+    return this.typesService.findByEvent(eventId);
+  }
+
   // Atualiza um ticket type
   @Patch(':id')
   async update(

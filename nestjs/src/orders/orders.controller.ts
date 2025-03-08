@@ -35,6 +35,13 @@ export class OrdersController {
     return this.ordersService.findOne(id);
   }
 
+  @Get('user/:userId')
+  async findByUser(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<Order[]> {
+    return this.ordersService.findByUserId(userId);
+  }
+
   // Atualiza um pedido
   @Patch(':id')
   async update(
